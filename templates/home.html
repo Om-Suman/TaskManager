@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Manager Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --danger: #ef4444;
+        --danger-hover: #dc2626;
+        --success: #10b981;
+        --success-hover: #059669;
+        --warning: #f59e0b;
+        --warning-hover: #d97706;
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --input-bg: #f1f5f9;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+        transition: all 0.2s ease-in-out;
+      }
+
+      body {
+        background: var(--bg-color);
+        color: var(--text-main);
+      }
+
+      /* Navbar */
+      .navbar {
+        background: var(--card-bg);
+        padding: 15px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .navbar h2 {
+        color: var(--primary);
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-weight: 500;
+      }
+
+      /* Buttons */
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+      .btn-danger:hover {
+        background: var(--danger-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: white;
+      }
+      .btn-success:hover {
+        background: var(--success-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-warning {
+        background: var(--warning);
+        color: white;
+      }
+      .btn-warning:hover {
+        background: var(--warning-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+      }
+      .btn-outline:hover {
+        background: var(--primary);
+        color: white;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 40px auto;
+      }
+
+      /* Stats */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .icon-blue {
+        background: #e0e7ff;
+        color: var(--primary);
+      }
+      .icon-green {
+        background: #d1fae5;
+        color: var(--success);
+      }
+      .icon-orange {
+        background: #fef3c7;
+        color: var(--warning);
+      }
+      .icon-red {
+        background: #fee2e2;
+        color: var(--danger);
+      }
+
+      .card-info h2 {
+        font-size: 1.8rem;
+        color: var(--text-main);
+      }
+      .card-info p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Create Task Form */
+      .create-task {
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+      }
+
+      .create-task h2 {
+        margin-bottom: 20px;
+        color: var(--text-main);
+        font-size: 1.25rem;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-main);
+        font-size: 0.95rem;
+      }
+
+      textarea {
+        resize: vertical;
+        height: 120px;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--card-bg);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      }
+
+      .create-task button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+      }
+
+      /* Search & Tasks */
+      .search-box {
+        position: relative;
+        margin-bottom: 30px;
+      }
+      .search-box i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+      .search-box input {
+        padding-left: 45px;
+        background: var(--card-bg);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+
+      .tasks {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 24px;
+      }
+
+      .task-card {
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .task-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+      }
+
+      .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      .task-header h3 {
+        font-size: 1.1rem;
+        color: var(--text-main);
+        line-height: 1.4;
+      }
+
+      .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .priority-high {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .priority-medium {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .priority-low {
+        background: #d1fae5;
+        color: #047857;
+      }
+
+      .task-desc {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        flex-grow: 1;
+        margin-bottom: 20px;
+      }
+
+      .task-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 15px;
+      }
+
+      .task-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .status-completed {
+        color: var(--success);
+        font-weight: 600;
+      }
+      .status-pending {
+        color: var(--warning);
+        font-weight: 600;
+      }
+
+      .task-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .task-actions button {
+        flex: 1;
+        padding: 8px;
+        font-size: 0.85rem;
+      }
+
+      .empty-state {
+        background: var(--card-bg);
+        padding: 60px 20px;
+        text-align: center;
+        border-radius: 16px;
+        border: 2px dashed var(--border-color);
+        color: var(--text-muted);
+      }
+      .empty-state i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+      }
+      .empty-state h3 {
+        color: var(--text-main);
+        margin-bottom: 8px;
+        font-size: 1.25rem;
+      }
+      :root {
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    /* Priority & Status Colors */
+    --priority-high: #ef4444;
+    --priority-high-bg: #fee2e2;
+    --priority-medium: #f59e0b;
+    --priority-medium-bg: #fef3c7;
+    --priority-low: #10b981;
+    --priority-low-bg: #d1fae5;
+    
+    --status-completed: #059669;
+    --status-completed-bg: #e6f4ea;
+    --status-pending: #2563eb;
+    --status-pending-bg: #eff6ff;
+
+    /* Action Buttons */
+    --btn-success: #10b981;
+    --btn-warning: #f59e0b;
+    --btn-danger: #ef4444;
+    
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --transition: all 0.2s ease-in-out;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+    margin: 0;
+    padding: 2rem;
+  }
+
+  /* Layout Wrapper */
+  .tasks-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  /* Beautiful Task Card */
+  .task-card {
+    background: var(--bg-card);
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: #cbd5e1;
+  }
+
+  /* Card Header & Badges */
+  .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .task-title-wrapper {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .task-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+  }
+
+  .task-id {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .priority-high { color: var(--priority-high); background: var(--priority-high-bg); }
+  .priority-medium { color: var(--priority-medium); background: var(--priority-medium-bg); }
+  .priority-low { color: var(--priority-low); background: var(--priority-low-bg); }
+
+  /* Body Text */
+  .task-desc {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.925rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    flex-grow: 1; /* Pushes meta & actions to the bottom if cards vary in description length */
+  }
+
+  /* Metadata Section */
+  .task-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px dashed #e2e8f0;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .task-deadline {
+    margin: 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  
+  .status-completed { color: var(--status-completed); background: var(--status-completed-bg); }
+  .status-pending { color: var(--status-pending); background: var(--status-pending-bg); }
+
+  /* Action Buttons Group */
+  .task-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .task-actions a {
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    justify-content: center;
+    transition: var(--transition);
+  }
+
+  /* Specific Button Styling */
+  .btn-success { background: #f0fdf4; color: var(--btn-success); border: 1px solid #bbf7d0; }
+  .btn-success:hover { background: var(--btn-success); color: white; }
+
+  .btn-warning { background: #fffbeb; color: var(--btn-warning); border: 1px solid #fef3c7; }
+  .btn-warning:hover { background: var(--btn-warning); color: white; }
+
+  .btn-danger { background: #fef2f2; color: var(--btn-danger); border: 1px solid #fee2e2; }
+  .btn-danger:hover { background: var(--btn-danger); color: white; }
+
+  /* Empty State styling */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-card);
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--radius);
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: var(--text-main);
+  }
+
+  .empty-state p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <h2><i class="fa-solid fa-layer-group"></i> TaskManager</h2>
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+        <span
+          ><i class="fa-regular fa-circle-user"></i> {{ user.username }}</span
+        >
+        <a href="{% url 'logout' %}" style="text-decoration: none">
+          <button class="btn-danger">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+          </button>
+        </a>
+        {% else %}
+        <a href="{% url 'user_login' %}" style="text-decoration: none">
+          <button class="btn-outline">Login</button>
+        </a>
+        <a href="{% url 'signup' %}" style="text-decoration: none">
+          <button class="btn-primary">Sign Up</button>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="stats">
+        <div class="card">
+          <div class="card-icon icon-blue">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div class="card-info">
+            <h2>{{ total_tasks|default:"0" }}</h2>
+            <p>Total Tasks</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon icon-green">
+            <i class="fa-solid fa-check-double"></i>
+          </div>
+          <div class="card-info">
+            <h2>{{ completed_tasks|default:"0" }}</h2>
+            <p>Completed</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon icon-orange">
+            <i class="fa-solid fa-hourglass-half"></i>
+          </div>
+          <div class="card-info">
+            <h2>{{ pending_tasks|default:"0" }}</h2>
+            <p>Pending</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-icon icon-red"><i class="fa-solid fa-fire"></i></div>
+          <div class="card-info">
+            <h2>{{ high_priority_tasks|default:"0" }}</h2>
+            <p>High Priority</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="create-task">
+        <h2>
+          <i class="fa-solid fa-plus-circle" style="color: var(--primary)"></i>
+          {% if task_to_edit %} Update Task {% else %}Create New Task {% endif %}
+        </h2>
+
+        <form
+          method="POST"
+          action="{% if task_to_edit %}{% url 'update_task' task_to_edit.id %}{% else %}{% url 'home' %}{% endif %}"
+        >
+          {% csrf_token %}
+          <div class="form-grid">
+            <div class="full-width">
+              <input
+                type="text"
+                name="title"
+                placeholder="Task Title"
+                value="{% if task_to_edit %}{{ task_to_edit.title }}{% endif %}"
+                required
+              />
+            </div>
+
+            <div class="full-width">
+              <textarea
+                name="description"
+                placeholder="Describe the task details..."
+              >
+{% if task_to_edit %}{{ task_to_edit.description }}{% endif %}</textarea
+              >
+            </div>
+
+            <div>
+              <select name="priority">
+                <option
+                  value="1"
+                  {%
+                  if
+                  task_to_edit
+                  and
+                  task_to_edit.priority=""
+                  ="1"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  🟢 Low Priority
+                </option>
+                <option
+                  value="2"
+                  {%
+                  if
+                  task_to_edit
+                  and
+                  task_to_edit.priority=""
+                  ="2"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  🟠 Medium Priority
+                </option>
+                <option
+                  value="3"
+                  {%
+                  if
+                  task_to_edit
+                  and
+                  task_to_edit.priority=""
+                  ="3"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  🔴 High Priority
+                </option>
+              </select>
+            </div>
+
+            <input
+                type="datetime-local"
+                name="deadline"
+                value="{% if task_to_edit %}{{ task_to_edit.deadline|date:'Y-m-d\TH:i' }}{% endif %}"
+                required
+              />
+
+            <div class="full-width">
+              <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Add Task
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search through your tasks..." />
+      </div>
+
+      <h2 style="margin-bottom: 20px; font-size: 1.25rem">
+        <i class="fa-solid fa-clipboard-list"></i> Your Tasks
+      </h2>
+
+      <div class="tasks-container">
+  {% if tasks %}
+    <div class="tasks-grid">
+      {% for task in tasks %}
+      <div class="task-card">
+        
+        <!-- Header -->
+        <div class="task-header">
+          <div class="task-title-wrapper">
+            <span class="task-id">#{{ task.id }}</span>
+            <h3>{{ task.title }}</h3>
+          </div>
+          {% if task.priority == 3 %}
+            <span class="badge priority-high">High</span>
+          {% elif task.priority == 2 %}
+            <span class="badge priority-medium">Medium</span>
+          {% else %}
+            <span class="badge priority-low">Low</span>
+          {% endif %}
+        </div>
+
+        <!-- Description -->
+        <p class="task-desc">{{ task.description }}</p>
+
+        <!-- Meta info (Deadline & Status) -->
+        <div class="task-meta">
+          <p class="task-deadline" style="color: var(--text-muted)">
+            <i class="fa-regular fa-calendar"></i> {{ task.deadline|date:"M d, Y" }}
+          </p>
+
+          {% if task.completed %}
+            <span class="status-tag status-completed">
+              <i class="fa-solid fa-circle-check"></i> Completed
+            </span>
+          {% else %}
+            <span class="status-tag status-pending">
+              <i class="fa-solid fa-clock"></i> Pending
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="task-actions">
+          {% if not task.completed %}
+          <a href="{% url 'complete_task' task.id %}" class="btn-success">
+            <i class="fa-solid fa-check"></i> Done
+          </a>
+          {% endif %}
+
+          <a href="?edit={{ task.id }}" class="btn-warning">
+            <i class="fa-solid fa-pen"></i> Edit
+          </a>
+
+          <a href="{% url 'delete_task' task.id %}" 
+             class="btn-danger" 
+             onclick="return confirm('Are you sure you want to delete this task?');">
+            <i class="fa-solid fa-trash"></i> Delete
+          </a>
+        </div>
+        
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State Layout -->
+    <div class="empty-state">
+      <i class="fa-solid fa-inbox"></i>
+      <h3>No Tasks Yet</h3>
+      <p>Create your first task above and start organizing your workflow.</p>
+    </div>
+  {% endif %}
+</div>
+  </body>
+</html>

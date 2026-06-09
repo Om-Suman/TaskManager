@@ -4,11 +4,12 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import tasks
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+
 
 def home(request):
     if not request.user.is_authenticated:

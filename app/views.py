@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .models import tasks
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 def home(request):
     if not request.user.is_authenticated:
@@ -74,6 +75,24 @@ def signup(request):
     })
 
 
+def search_tasks(request):
+    search_query = request.GET.get('search')
+
+    results = tasks.objects.filter(
+        Q(title__icontains=search_query) |
+        Q(description__icontains=search_query),
+        user=request.user
+    )
+
+    return render(request,'home.html', {
+        'tasks':results,
+        'search_query': search_query,
+        'total_tasks': tasks.objects.filter(user=request.user).count(),
+        'completed_tasks': tasks.objects.filter(user=request.user, completed=True).count(),
+        'pending_tasks': tasks.objects.filter(user=request.user, completed=False).count(),
+        'high_priority_tasks': tasks.objects.filter(user=request.user, priority=3).count()
+    })
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -94,8 +113,6 @@ def user_login(request):
 
     return render(request, 'auth.html')
 
-from django.contrib.auth import logout
-from django.shortcuts import redirect
 
 def complete_task(request, task_id):
     task = tasks.objects.get(id=task_id)

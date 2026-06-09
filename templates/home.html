@@ -420,6 +420,17 @@
     --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
     --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --transition: all 0.2s ease-in-out;
+
+    .search-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.search-box input{
+    flex:1;
+}
   }
 
   body {
@@ -768,10 +779,26 @@
         </form>
       </div>
 
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search through your tasks..." />
-      </div>
+      <form
+    class="search-box"
+    action="{% url 'search_tasks' %}"
+    method="GET"
+>
+
+    <i class="fa-solid fa-magnifying-glass"></i>
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search through your tasks..."
+        value="{{ search_query }}"
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
 
       <h2 style="margin-bottom: 20px; font-size: 1.25rem">
         <i class="fa-solid fa-clipboard-list"></i> Your Tasks

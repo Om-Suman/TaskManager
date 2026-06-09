@@ -1,5 +1,3 @@
-
-
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
@@ -9,6 +7,7 @@ from django.contrib import messages
 from .models import tasks
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from datetime import date, datetime
 
 
 def home(request):
@@ -76,24 +75,81 @@ def signup(request):
     })
 
 
-def search_tasks(request):
-    search_query = request.GET.get('search')
+def search_filter_task(request):
 
-    results = tasks.objects.filter(
-        Q(title__icontains=search_query) |
-        Q(description__icontains=search_query),
+    task_list = tasks.objects.filter(
         user=request.user
     )
 
-    return render(request,'home.html', {
-        'tasks':results,
+    # Search
+    search_query = request.GET.get('search', '')
+
+    if search_query:
+        task_list = task_list.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    # Priority Filter
+    priority = request.GET.get('priority', '')
+
+    if priority:
+        task_list = task_list.filter(
+            priority=priority
+        )
+
+    # Status Filter
+    status = request.GET.get('status', '')
+
+    if status == 'completed':
+        task_list = task_list.filter(
+            completed=True
+        )
+
+    elif status == 'pending':
+        task_list = task_list.filter(
+            completed=False
+        )
+
+    # Deadline Filter
+    deadline = request.GET.get('deadline', '')
+
+    today = date.today()
+
+    if deadline == 'today':
+        task_list = task_list.filter(
+            deadline__date=today,
+            completed=False
+        )
+
+    elif deadline == 'upcoming':
+        task_list = task_list.filter(
+            deadline__date__gt=today
+        )
+
+    elif deadline == 'overdue':
+        task_list = task_list.filter(
+            deadline__date__lt=today,
+            completed=False
+        )
+
+    return render(request, 'home.html', {
+
+        'tasks': task_list,
+
         'search_query': search_query,
+        'selected_priority': priority,
+        'selected_status': status,
+        'selected_deadline': deadline,
+
         'total_tasks': tasks.objects.filter(user=request.user).count(),
         'completed_tasks': tasks.objects.filter(user=request.user, completed=True).count(),
         'pending_tasks': tasks.objects.filter(user=request.user, completed=False).count(),
-        'high_priority_tasks': tasks.objects.filter(user=request.user, priority=3).count()
+        'high_priority_tasks': tasks.objects.filter(user=request.user, priority=3).count(),
     })
 
+def clear_filters(request):
+    return redirect('home')
 
 def user_login(request):
     if request.method == 'POST':

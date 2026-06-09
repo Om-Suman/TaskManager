@@ -616,7 +616,132 @@
     color: var(--text-muted);
     font-size: 0.95rem;
   }
+  :root {
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #cbd5e1;
+    --border-focus: #3b82f6;
+    
+    /* Buttons */
+    --btn-primary: #2563eb;
+    --btn-primary-hover: #1d4ed8;
+    --btn-clear-text: #475569;
+    --btn-clear-bg: #f1f5f9;
+    --btn-clear-hover: #e2e8f0;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --transition: all 0.2s ease-in-out;
+  }
+
+  /* Form Container */
+  .filter-form {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  /* Shared Input & Select Styles */
+  .filter-input {
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    color: var(--text-main);
+    background-color: #fff;
+    outline: none;
+    transition: var(--transition);
+    flex: 1;
+    min-width: 140px;
+    font-family: inherit;
+  }
+
+  .filter-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  /* Search Input Wrapper */
+  .search-wrapper {
+    flex: 2; /* Makes the search bar take up more space than dropdowns */
+    min-width: 240px;
+    position: relative;
+  }
+
+  .search-wrapper input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Action Buttons Group */
+  .filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+  }
+
+  .btn-submit, .btn-clear {
+    padding: 0.65rem 1.25rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  .btn-submit {
+    background-color: var(--btn-primary);
+    color: #ffffff;
+  }
+
+  .btn-submit:hover {
+    background-color: var(--btn-primary-hover);
+  }
+
+  .btn-clear {
+    background-color: var(--btn-clear-bg);
+    color: var(--btn-clear-text);
+  }
+
+  .btn-clear:hover {
+    background-color: var(--btn-clear-hover);
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .filter-form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .search-wrapper, .filter-input {
+      width: 100%;
+    }
+    .filter-actions {
+      width: 100%;
+    }
+    .btn-submit, .btn-clear {
+      flex: 1;
+    }
+  }
+  
     </style>
+    
   </head>
 
   <body>
@@ -779,24 +904,46 @@
         </form>
       </div>
 
-      <form
-    class="search-box"
-    action="{% url 'search_tasks' %}"
-    method="GET"
->
+      <form method="GET" action="{% url 'search_filter_task' %}" class="filter-form">
 
-    <i class="fa-solid fa-magnifying-glass"></i>
-
+  <div class="search-wrapper">
     <input
-        type="text"
-        name="search"
-        placeholder="Search through your tasks..."
-        value="{{ search_query }}"
+      type="text"
+      name="search"
+      placeholder="Search tasks..."
+      value="{{ search_query }}"
+      class="filter-input"
     >
+  </div>
 
-    <button type="submit">
-        Search
+  <select name="priority" class="filter-input">
+    <option value="">All Priorities</option>
+    <option value="1" {% if selected_priority == "1" %}selected{% endif %}>Low</option>
+    <option value="2" {% if selected_priority == "2" %}selected{% endif %}>Medium</option>
+    <option value="3" {% if selected_priority == "3" %}selected{% endif %}>High</option>
+  </select>
+
+  <select name="status" class="filter-input">
+    <option value="">All Status</option>
+    <option value="completed" {% if selected_status == "completed" %}selected{% endif %}>Completed</option>
+    <option value="pending" {% if selected_status == "pending" %}selected{% endif %}>Pending</option>
+  </select>
+
+  <select name="deadline" class="filter-input">
+    <option value="">All Deadlines</option>
+    <option value="today" {% if selected_deadline == "today" %}selected{% endif %}>Today</option>
+    <option value="upcoming" {% if selected_deadline == "upcoming" %}selected{% endif %}>Upcoming</option>
+    <option value="overdue" {% if selected_deadline == "overdue" %}selected{% endif %}>Overdue</option>
+  </select>
+
+  <div class="filter-actions">
+    <button type="submit" class="btn-submit">
+      <i class="fa-solid fa-filter"></i> Apply
     </button>
+    <a href="{% url 'clear_filters' %}" class="btn-clear">
+      <i class="fa-solid fa-rotate-left"></i> Clear
+    </a>
+  </div>
 
 </form>
 
@@ -804,9 +951,9 @@
         <i class="fa-solid fa-clipboard-list"></i> Your Tasks
       </h2>
 
-      <div class="tasks-container">
+      <div class="tasks-container" >
   {% if tasks %}
-    <div class="tasks-grid">
+    <div class="tasks-grid" >
       {% for task in tasks %}
       <div class="task-card">
         

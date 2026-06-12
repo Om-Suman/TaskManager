@@ -48,17 +48,16 @@ def home(request):
     })
 
 
-
 def signup(request):
     if request.method == "POST":
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists")
+        if User.objects.filter(username=username,email=email).exists():
             return render(request, "auth.html", {
-                "show_signup": True
+                "show_signup": True,
+                "signup_error": "Username or email already exists"
             })
 
         User.objects.create_user(
@@ -67,11 +66,12 @@ def signup(request):
             password=password
         )
 
-        messages.success(request, "Account created successfully")
+        # messages.success(request, "Account created successfully")
         return redirect('home')
 
     return render(request, "auth.html", {
-        "show_signup": True
+        "show_signup": True,
+        "signup_error": "Username or email already exists"
     })
 
 
@@ -166,9 +166,10 @@ def user_login(request):
             login(request, user)
             return redirect('home')
 
-        messages.error(request, "Invalid username or password")
 
-    return render(request, 'auth.html')
+    return render(request, 'auth.html', {
+        "login_error": "Invalid username or password"
+    })
 
 
 def complete_task(request, task_id):

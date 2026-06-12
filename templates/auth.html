@@ -217,9 +217,9 @@
           <div class="logo">📋</div>
           <h1>Task Manager</h1>
           <span>Create your workspace account</span>
-          {% if messages %} {% for message in messages %}
-          <div class="message">{{ message }}</div>
-          {% endfor %} {% endif %}
+          {% if signup_error %}
+            <div class="message">{{ signup_error }}</div>
+          {% endif %}
 
           <input type="text" name="username" placeholder="Username" required />
 
@@ -249,7 +249,9 @@
           <div class="logo">📋</div>
           <h1>Welcome Back</h1>
           <span>Sign in to manage your tasks</span>
-
+          {% if login_error %}
+            <div class="message">{{ login_error }}</div>
+          {% endif %}
           <input type="text" name="username" placeholder="Username" required />
 
           <input
@@ -261,6 +263,7 @@
 
           <button type="submit">Sign In</button>
         </form>
+        
       </div>
 
       <!-- OVERLAY -->
